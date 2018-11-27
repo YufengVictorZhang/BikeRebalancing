@@ -16,14 +16,13 @@
 #include "link.h"
 #include "node.h"
 #include "readNetwork.h"
-#include "MCFP.h"
-#include "RestrictedMCFP.h"
+//#include "MCFP.h"
 #include "route.h"
 #include "RandomRoute.h"
+#include "restrictedNetwork.h"
+#include "RestrictedMCFP.h"
 
 using namespace std;
-
-
 
 int main(int argc, char** argv) {
     
@@ -32,8 +31,16 @@ int main(int argc, char** argv) {
 	//readNetwork("C:/users/zhan4879/Google Drive/Bike Sharing System/Niceride Station Distance Calculation/");
 	readNetwork("C:/Users/victo/Downloads/");
 	cout << "Finish reading the network!" << endl;
-	list<string> route1;
-	route1 = randomPath();
+	generateRouteSet();
+	createResNetwork();
+	solveResMCFP();
+	cout << "Wait!" << '\n';
+
+	/*list<string> route1 = randomPath();
+
+	for (auto iter = route1.begin(); iter != route1.end(); iter++) {
+		cout << *iter << '\n';
+	}*/
 	//cout << route1 << '\n';
 	//int counter = 0;
 	//for (auto iter = links.begin(); iter != links.end(); iter++) {

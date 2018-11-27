@@ -28,7 +28,7 @@ class node{
     int demand = 0;
     int storage;
     int iniInv; 
-    int capacity = 15;
+    int capacity = 16;
 	float label = 0.0;
 	string pred = "";
     vector <string> outLinks;
@@ -66,7 +66,7 @@ public:
     }
     
     const vector<string>& getOutLinks(){
-        return outLinks;
+        return outLinks;	
     }
     
     const vector<string>& getInLinks(){

@@ -7,12 +7,16 @@
 #include <random>
 #include <string>
 #include <list>
+#include <time.h>
 
 using namespace std;
 
+list<string> routeSet;
+list<string> route;
 
 const list<string>& randomPath() {	
-	list<string> path;
+	route.clear();
+	srand(time(NULL));
 	string currentNode, currentLink;
 	currentNode = "D1";
 	currentLink = "";
@@ -20,11 +24,21 @@ const list<string>& randomPath() {
 		int size, index;
 		size = int(nodes[currentNode]->getOutLinks().size());
 		index = rand() % size;
-		cout << index;
 		currentLink = nodes[currentNode]->getOutLinks()[index];
-		cout << currentLink << '\n';
-		path.push_back(currentLink);
-		currentNode = currentLink.substr(1, currentLink.find(","));
+		route.push_back(currentLink);
+		currentNode = currentLink.substr(currentLink.find(",")+1, currentLink.length());
 	}	
-	return path;
+	return route;
 }
+
+void generateRouteSet() {
+	routeSet.clear();
+	for (int i = 0; i <10; i++) {
+		list<string> singleroute;
+		singleroute = randomPath();
+		for (auto iter = singleroute.begin(); iter!= singleroute.end(); iter++) {
+			routeSet.push_back(*iter);
+		}
+	}
+}
+

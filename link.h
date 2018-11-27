@@ -27,6 +27,7 @@ class link{
 	float MCFPcost = 0;
     int cap = 0;
     int flow = 0;
+	int resNetwork = 1;
 	string type = "";
     
 public:
@@ -95,6 +96,21 @@ public:
 	string getType() {
 		return type;
 	}
+
+	void resetResNetwork() {
+		
+		resNetwork = 0;
+	
+	}
+
+	void setResNetwork() {
+		resNetwork = 1;
+	}
+
+	int getResStatus() {
+		return resNetwork;
+	}
+
 };
 
 
