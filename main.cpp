@@ -16,11 +16,13 @@
 #include "link.h"
 #include "node.h"
 #include "readNetwork.h"
-//#include "MCFP.h"
+#include "MCFP.h"
 #include "route.h"
 #include "RandomRoute.h"
 #include "restrictedNetwork.h"
 #include "RestrictedMCFP.h"
+#include "consolidateRoutes.h"
+#include "routeRepair.h"
 
 using namespace std;
 
@@ -35,7 +37,8 @@ int main(int argc, char** argv) {
 	createResNetwork();
 	solveResMCFP();
 	cout << "Wait!" << '\n';
-
+	consolidateRoutes();
+	return 0;
 	/*list<string> route1 = randomPath();
 
 	for (auto iter = route1.begin(); iter != route1.end(); iter++) {

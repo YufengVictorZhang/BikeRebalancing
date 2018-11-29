@@ -7,7 +7,8 @@
 #include <random>
 #include <string>
 #include <list>
-#include <time.h>
+#include <ctime>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -16,7 +17,6 @@ list<string> route;
 
 const list<string>& randomPath() {	
 	route.clear();
-	srand(time(NULL));
 	string currentNode, currentLink;
 	currentNode = "D1";
 	currentLink = "";
@@ -27,17 +27,20 @@ const list<string>& randomPath() {
 		currentLink = nodes[currentNode]->getOutLinks()[index];
 		route.push_back(currentLink);
 		currentNode = currentLink.substr(currentLink.find(",")+1, currentLink.length());
+		
 	}	
 	return route;
 }
 
 void generateRouteSet() {
 	routeSet.clear();
-	for (int i = 0; i <10; i++) {
+	srand(time(NULL));
+	for (int i = 0; i<35; i++) {
 		list<string> singleroute;
 		singleroute = randomPath();
 		for (auto iter = singleroute.begin(); iter!= singleroute.end(); iter++) {
 			routeSet.push_back(*iter);
+			//cout << *iter << '\n';
 		}
 	}
 }

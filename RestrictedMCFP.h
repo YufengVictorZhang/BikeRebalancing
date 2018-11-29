@@ -13,6 +13,7 @@
 
 using namespace std;
 
+vector<string> activeLinkSet;
 
 int solveResMCFP() {
 	ofstream logfile("restrictedmcfp.log");
@@ -93,7 +94,7 @@ int solveResMCFP() {
 					getline(ss, substr, ',');
 					tokens.push_back(substr);
 				}
-				model.addConstr(y[yIndexName[(*iter).first]], GRB_LESS_EQUAL, (nodes[tokens[1]]->getCapacity()));
+				model.addConstr(y[yIndexName[(*iter).first]], GRB_LESS_EQUAL, nodes[tokens[1]]->getCapacity());
 
 			}
 		}
@@ -104,12 +105,13 @@ int solveResMCFP() {
 			}
 		}
 
+		//model.set(GRB_DoubleParam_MIPGap, 0.05);
 		model.optimize();
 
 		cout << "\nTOTAL COSTS: " << model.get(GRB_DoubleAttr_ObjVal) << endl;
 
 		//set MCFP solutions to the links in the network (only contains transshipment flows)
-		clearMCFPsol();
+		//clearMCFPsol();
 		//for (int i = 0; i < activeLink; i++) {
 		//	if (y[i].get(GRB_DoubleAttr_X) != 0) {
 		//		vector<string> tokens;
@@ -127,10 +129,12 @@ int solveResMCFP() {
 		//		}
 		//	}
 		//}
+
 		for (auto iter = links.begin(); iter != links.end(); iter++) {
 			if ((*iter).second->getResStatus() == 1 && (*iter).second->getType() == "transship") {
 				if (y[xIndexName[(*iter).first]].get(GRB_DoubleAttr_X) != 0) {
-					cout << (*iter).first<<'\t'<< y[xIndexName[(*iter).first]].get(GRB_DoubleAttr_X) << '\n';
+					//cout << (*iter).first<<'\t'<< y[xIndexName[(*iter).first]].get(GRB_DoubleAttr_X) << '\n';
+					activeLinkSet.push_back((*iter).first);
 				}
 			}
 		}

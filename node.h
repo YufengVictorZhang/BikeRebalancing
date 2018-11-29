@@ -28,7 +28,7 @@ class node{
     int demand = 0;
     int storage;
     int iniInv; 
-    int capacity = 16;
+    int capacity = 18;
 	float label = 0.0;
 	string pred = "";
     vector <string> outLinks;
