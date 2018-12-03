@@ -48,10 +48,9 @@ void consolidateRoutes() {
 	}
 	sort(activeLinkSetcopy.begin(), activeLinkSetcopy.end(), less_than_key());  // sort activeLinkSetcopy
 
-	for (auto iter = activeLinkSetcopy.begin(); iter != activeLinkSetcopy.end(); iter++) {
+	/*for (auto iter = activeLinkSetcopy.begin(); iter != activeLinkSetcopy.end(); iter++) {
 		cout << (*iter).stringValue << '\t';
-	}
-
+	}*/
 
 
 	vector<string> candidateRoute;

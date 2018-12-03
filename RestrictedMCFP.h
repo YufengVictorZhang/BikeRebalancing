@@ -13,6 +13,7 @@
 
 using namespace std;
 
+
 vector<string> activeLinkSet;
 
 int solveResMCFP() {
@@ -43,6 +44,9 @@ int solveResMCFP() {
 
 		GRBVar* y = model.addVars(activeLink, GRB_INTEGER);
 		GRBVar* x = model.addVars(activeLink, GRB_BINARY);
+		GRBVar* Splus = model.addVars(nodes.size(), GRB_INTEGER);
+		GRBVar* Sminus = model.addVars(nodes.size(), GRB_INTEGER);
+
 
 		map<string, int> yIndexName;
 		map<string, int> xIndexName;

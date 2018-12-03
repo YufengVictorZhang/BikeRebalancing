@@ -20,9 +20,11 @@
 #include "route.h"
 #include "RandomRoute.h"
 #include "restrictedNetwork.h"
-#include "RestrictedMCFP.h"
+//#include "RestrictedMCFP.h"
+#include "respartialMCFP.h"
 #include "consolidateRoutes.h"
 #include "routeRepair.h"
+#include "objectiveEvaluation.h"
 
 using namespace std;
 
@@ -35,9 +37,14 @@ int main(int argc, char** argv) {
 	cout << "Finish reading the network!" << endl;
 	generateRouteSet();
 	createResNetwork();
-	solveResMCFP();
+	//solveResMCFP();
+	solveResParMCFP();
 	cout << "Wait!" << '\n';
 	consolidateRoutes();
+	double c = unmetCost();
+	cout << c << '\n';
+	c = totalCost();
+	cout << c << '\n';
 	return 0;
 	/*list<string> route1 = randomPath();
 

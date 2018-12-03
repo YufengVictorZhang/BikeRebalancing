@@ -27,15 +27,14 @@ const list<string>& randomPath() {
 		currentLink = nodes[currentNode]->getOutLinks()[index];
 		route.push_back(currentLink);
 		currentNode = currentLink.substr(currentLink.find(",")+1, currentLink.length());
-		
-	}	
+	}
 	return route;
 }
 
 void generateRouteSet() {
 	routeSet.clear();
 	srand(time(NULL));
-	for (int i = 0; i<35; i++) {
+	for (int i = 0; i<10; i++) {
 		list<string> singleroute;
 		singleroute = randomPath();
 		for (auto iter = singleroute.begin(); iter!= singleroute.end(); iter++) {
