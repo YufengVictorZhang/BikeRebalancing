@@ -174,7 +174,7 @@ int solveResParMCFP() {
 			}
 		}
 
-		//model.set(GRB_DoubleParam_MIPGap, 0.05);
+		model.set(GRB_DoubleParam_MIPGap, 0.03);
 		model.optimize();
 
 		cout << "\nTOTAL COSTS: " << model.get(GRB_DoubleAttr_ObjVal) << endl;

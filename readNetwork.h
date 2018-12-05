@@ -26,6 +26,7 @@ using namespace std;
 
 map<string, node*> nodes;
 map<string, link*> links;
+map<string, map<string, int>> traveltime;
 
 float demandCoef;
 float distanceCoef;
@@ -37,14 +38,15 @@ void readParameters(float _distance, float _demand){
 }
 
 void readNetwork(const string loc){
-    string nInput, lInput;
+    string nInput, lInput, dInput;
     string line;
     node* tmpNodePntr;
     link* tmpLinkPntr;
     
     nInput = loc + "NiceRideNodes_May1820.txt";
     lInput = loc + "NiceRideLinks_May1820.txt";
-    
+	dInput = loc + "Distance.txt";
+
     ifstream nodefile (nInput);
     if (nodefile.is_open()){
         while( getline(nodefile, line)){
@@ -86,6 +88,38 @@ void readNetwork(const string loc){
     }
     linkfile.close();
     
+	ifstream distancefile (dInput);
+	if (distancefile.is_open()) {
+		getline(distancefile, line);
+		string fromNode = "";
+		map<string, int> dis;
+
+		while (getline(distancefile, line)) {
+			stringstream ss(line);
+			vector<string> tokens;
+			string buf;
+			
+			while (ss >> buf) {
+				tokens.push_back(buf);
+			}
+
+			if (tokens[0] != fromNode) {
+				if (dis.size() != 0) {
+					traveltime[fromNode] = dis;
+					dis.clear();
+				}
+			}
+			
+			if (stoi(tokens[4]) <= 3) {   // distance greater than 3 are not used as potential links
+				dis[tokens[1]] = stoi(tokens[4]);
+			}
+
+			fromNode = tokens[0];
+		}
+		traveltime[fromNode] = dis;
+	}
+
+	distancefile.close();
 }
 
 
