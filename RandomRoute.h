@@ -12,11 +12,11 @@
 
 using namespace std;
 
-list<string> routeSet;
-list<string> route;
+list<string> routeLinkSet;   //used to restore generated vehicle routes, including the initially randomaly generated ones
 
-const list<string>& randomPath() {	
-	route.clear();
+const list<string> randomRoute() {	
+	list<string> route;
+	//route.clear();
 	string currentNode, currentLink;
 	currentNode = "D1";
 	currentLink = "";
@@ -31,16 +31,23 @@ const list<string>& randomPath() {
 	return route;
 }
 
-void generateRouteSet() {
-	routeSet.clear();
+void genInitialRouteLinkSet() {
+	routeLinkSet.clear();
 	srand(time(NULL));
 	for (int i = 0; i<10; i++) {
 		list<string> singleroute;
-		singleroute = randomPath();
+		singleroute = randomRoute();
 		for (auto iter = singleroute.begin(); iter!= singleroute.end(); iter++) {
-			routeSet.push_back(*iter);
+			routeLinkSet.push_back(*iter);
 			//cout << *iter << '\n';
 		}
 	}
 }
+
+//void genRouteLinkSet() {
+//	routeLinkSet.clear();
+//	for (auto iter = ) {
+//		routeLinkSet.push_back((*iter));
+//	}
+//}
 

@@ -19,6 +19,7 @@
 #include <string>
 #include <random>
 #include <ctime>
+#include <algorithm>
 #include <stdlib.h>
 
 using namespace std;
@@ -103,10 +104,12 @@ class rebalancingRoute {
 		void intraNS(int);				// node swapping
 
 		void interCR(int, rebalancingRoute &);
-		/*void interNS(int, rebalancingRoute &);
+		void interNS(int, rebalancingRoute &);
 		void interSH(int, rebalancingRoute &);
-		void interCT(int, rebalancingRoute &);*/
+		void interCT(rebalancingRoute &);  //concatenating two routes by cutting down them into two parts
 
+		int checkTimeFeasibility();
+		void updateLength();
 };
 
 rebalancingRoute::rebalancingRoute(vector<string>& _r) {
@@ -136,9 +139,9 @@ void rebalancingRoute::intraRI(int neighbor) {    // reinsertion a subsequence t
 
 	route.insert(iter + loc, subsequence.begin(), subsequence.end());
 
-	for (auto iter = route.begin(); iter != route.end(); iter++) {
-		cout << (*iter) << '\t';
-	}
+	//for (auto iter = route.begin(); iter != route.end(); iter++) {
+	//	cout << (*iter) << '\t';
+	//}
 
 	//constructRoute(route);
 }
@@ -173,26 +176,20 @@ void rebalancingRoute::intraNS(int neighbor) {
 	latest1 = latest2 = 999;
 
 	vector<string>::iterator iter = route.begin();
-	cout << '\n' << "route before\n";
-	for (auto iter = route.begin(); iter != route.end(); iter++) {
-		cout << (*iter) << '\t';
-	}
 
 	for (int i = 0; i < neighbor; i++) {
 		do {
 			loc1 = rand() % (length-1);
 			loc2 = rand() % (length-1);
 		} while (loc2 == loc1 || (latest1==loc2 && latest2==loc1));
-		cout << "location" << '\n';
-		cout << loc1 << '\t' << loc2 << '\n';
-		
 		std::iter_swap(iter + loc1, iter + loc2);
 	}
 
-	cout << '\n' << "route after\n";
+	/*cout << "after route\n";
 	for (auto iter = route.begin(); iter != route.end(); iter++) {
 		cout << (*iter) << '\t';
 	}
+	cout << "\n";*/
 }
 
 //void rebalancingRoute::intraAD (int neighbor, rebalancingRoute& route2) {
@@ -213,19 +210,139 @@ void rebalancingRoute::interCR(int neighbor, rebalancingRoute& route2) { //inter
 	iter1 = route.begin();
 	iter2 = route2.route.begin();
 	swap_ranges(iter1 + begin1, iter1 + end1, iter2 + begin2);
+
+	/*cout << "after route\n";
+	for (auto iter = route.begin(); iter != route.end(); iter++) {
+		cout << (*iter) << '\t';
+	}
+	cout << "\n";
+	for (auto iter = route2.route.begin(); iter != route2.route.end(); iter++) {
+		cout << (*iter) << '\t';
+	}
+	cout << "\n";*/
 }
 
-//void rebalancingRoute::interNS(int neighbor, rebalancingRoute& route2) {  //node swapping
-//
-//}
-//
-//void rebalancingRoute::interSH(int neighbor, rebalancingRoute& route2) {  // shift
-//
-//}
-//
-//void rebalancingRoute::interCT(int neighbor) { // break routes and concatenate them to construct new routes
-//
-//
-//}
+void rebalancingRoute::interNS(int neighbor, rebalancingRoute& route2) {  //node swapping
+	int begin1, begin2;
+	vector<string>::iterator iter1;
+	vector<string>::iterator iter2;
+	vector<int> vec1;
+	vector<int> vec2;
+	vector<int>::iterator it;
 
+	iter1 = route.begin();
+	iter2 = route2.route.begin();
+
+	for (int i = 0; i < neighbor; i++) {
+
+		do {
+			begin1 = rand() % (length - 1);
+			it = find(vec1.begin(), vec1.end(), begin1);
+		} while (it!=vec1.end());
+
+		do {
+			begin2 = rand() % (route2.length - 1);
+			it = find(vec2.begin(), vec2.end(), begin2);
+		} while (it!=vec2.end());
+
+		vec1.push_back(begin1);
+		vec2.push_back(begin2);
+		std::iter_swap(iter1 + begin1, iter2 + begin2);
+	}
+	/*cout << "after route\n";
+	for (auto iter = route.begin(); iter != route.end(); iter++) {
+		cout << (*iter) << '\t';
+	}
+	cout << "\n";
+	for (auto iter = route2.route.begin(); iter != route2.route.end(); iter++) {
+		cout << (*iter) << '\t';
+	}
+	cout << "\n";*/
+}
+
+
+void rebalancingRoute::interSH(int neighbor, rebalancingRoute& route2) {  // SHIFT, the route have subsequence shifted to should be orignially shorter
+	int loc;
+	vector<string>::iterator iter1, iter2;
+
+	
+	for (int i = 0; i < neighbor; i++) {
+		iter1 = route.begin();
+		iter2 = route2.route.begin();
+		loc = rand() % min(length-1, route2.length-1);
+		route.insert(iter1 + loc, *(iter2 + loc));
+		route2.route.erase(iter2 + loc);
+		this->updateLength();
+		route2.updateLength();
+	}
+
+
+	/*cout << "after route\n";
+	for (auto iter = route.begin(); iter != route.end(); iter++) {
+		cout << (*iter) << '\t';
+	}
+	cout << "\n";
+	for (auto iter = route2.route.begin(); iter != route2.route.end(); iter++) {
+		cout << (*iter) << '\t';
+	}
+	cout << "\n";*/
+}
+
+
+void rebalancingRoute::interCT(rebalancingRoute& route2) { // break routes and concatenate them to construct new routes
+
+	int break1, break2;
+	int quarter1 = int(length / 4);
+	int quarter2 = int(route2.length / 4);
+	vector<string>::iterator iter1, iter2;
+	vector<string> sequence1, sequence2;
+	iter1 = route.begin();
+	iter2 = route2.route.begin();
+
+	break1 = rand() % (quarter1 * 2) - quarter1 + int(length / 2);
+	break2 = rand() % (quarter2 * 2) - quarter2 + int(route2.length / 2);
+
+	cout << break1 << '\t' << break2 << '\n';
+	sequence1.insert(sequence1.begin(), iter1 + break1, iter1 + length);
+	sequence2.insert(sequence2.begin(), iter2 + break2, iter2 + route2.length);
+	
+	route.erase(iter1 + break1, iter1 + length);
+	route2.route.erase(iter2 + break2, iter2 + route2.length);
+
+	route.insert(route.end(), sequence2.begin(), sequence2.end());
+	route2.route.insert(route2.route.end(), sequence1.begin(), sequence1.end());
+
+
+	/*cout << "after route\n";
+	for (auto iter = route.begin(); iter != route.end(); iter++) {
+		cout << (*iter) << '\t';
+	}
+	cout << "\n";
+	for (auto iter = route2.route.begin(); iter != route2.route.end(); iter++) {
+		cout << (*iter) << '\t';
+	}
+	cout << "\n";*/
+}
+
+int rebalancingRoute::checkTimeFeasibility() {
+	int time = 0;
+	for (auto iter = route.begin(); iter != route.end()-1; iter++) {
+		if (*(iter) == *(iter + 1)) {
+			time += 1;
+		}
+		else {
+			time += traveltime[(*iter)][(*(iter + 1))];
+		}		
+	}
+
+	if (time <= 60) {   //extern int PlanningHorizon;
+		return 1;
+	}
+	return 0;
+}
+
+
+void rebalancingRoute::updateLength() {
+	length = route.size();
+}
 #endif /* LOCALSEARCH_H */

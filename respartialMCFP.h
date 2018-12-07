@@ -13,7 +13,7 @@ using namespace std;
 
 const int alpha = 10;
 
-vector<string> activeLinkSet;
+vector<string> positiveLinkSet;
 
 int solveResParMCFP() {
 	ofstream logfile("restrictedpartialmcfp.log");
@@ -179,11 +179,12 @@ int solveResParMCFP() {
 
 		cout << "\nTOTAL COSTS: " << model.get(GRB_DoubleAttr_ObjVal) << endl;
 
+		positiveLinkSet.clear();
 		for (auto iter = links.begin(); iter != links.end(); iter++) {
 			if ((*iter).second->getResStatus() == 1 && (*iter).second->getType() == "transship") {
 				if (y[xIndexName[(*iter).first]].get(GRB_DoubleAttr_X) != 0) {
 					//cout << (*iter).first<<'\t'<< y[xIndexName[(*iter).first]].get(GRB_DoubleAttr_X) << '\n';
-					activeLinkSet.push_back((*iter).first);
+					positiveLinkSet.push_back((*iter).first);
 				}
 			}
 		}

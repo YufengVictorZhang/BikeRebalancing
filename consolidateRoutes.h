@@ -11,7 +11,6 @@ using namespace std;
 struct MyStruct;
 struct less_than_key;
 
-vector<MyStruct> activeLinkSetcopy;
 vector< vector<string> > routes;
 
 struct MyStruct
@@ -42,15 +41,13 @@ struct less_than_key
 
 
 void consolidateRoutes() {
-
-	for (auto iter = activeLinkSet.begin(); iter != activeLinkSet.end(); iter++) {
+	vector<MyStruct> activeLinkSetcopy;
+	activeLinkSetcopy.clear();
+	routes.clear();
+	for (auto iter = positiveLinkSet.begin(); iter != positiveLinkSet.end(); iter++) {
 		activeLinkSetcopy.push_back(MyStruct(*iter));
 	}
 	sort(activeLinkSetcopy.begin(), activeLinkSetcopy.end(), less_than_key());  // sort activeLinkSetcopy
-
-	/*for (auto iter = activeLinkSetcopy.begin(); iter != activeLinkSetcopy.end(); iter++) {
-		cout << (*iter).stringValue << '\t';
-	}*/
 
 
 	vector<string> candidateRoute;

@@ -7,7 +7,7 @@ using namespace std;
 
 double travelCost() {
 	double c = 0;
-	for (auto iter = routeSet.begin(); iter != routeSet.end(); iter++) {
+	for (auto iter = routeLinkSet.begin(); iter != routeLinkSet.end(); iter++) {
 		string route = (*iter);
 		c += links[route]->getDistance();
 	}

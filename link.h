@@ -89,7 +89,7 @@ public:
 		return MCFPsol;
 	}
 
-	int getMCFPcost() {
+	float getMCFPcost() {
 		return MCFPcost;
 	}
 

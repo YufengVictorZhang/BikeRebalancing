@@ -14,7 +14,7 @@
 using namespace std;
 
 
-vector<string> activeLinkSet;
+vector<string> positiveLinkSet;
 
 int solveResMCFP() {
 	ofstream logfile("restrictedmcfp.log");
@@ -138,7 +138,7 @@ int solveResMCFP() {
 			if ((*iter).second->getResStatus() == 1 && (*iter).second->getType() == "transship") {
 				if (y[xIndexName[(*iter).first]].get(GRB_DoubleAttr_X) != 0) {
 					//cout << (*iter).first<<'\t'<< y[xIndexName[(*iter).first]].get(GRB_DoubleAttr_X) << '\n';
-					activeLinkSet.push_back((*iter).first);
+					positiveLinkSet.push_back((*iter).first);
 				}
 			}
 		}
