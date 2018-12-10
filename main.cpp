@@ -24,14 +24,12 @@
 //#include "RestrictedMCFP.h"
 //#include "respartialMCFP.h"
 #include "consolidateRoutes.h"
+#include "RepairRoutes.h"
 #include "objectiveEvaluation.h"
 
-#include "RepairRoutes.h"
 #include "localsearch.h"
 
 using namespace std;
-
-
 
 
 int main(int argc, char** argv) {
@@ -49,13 +47,14 @@ int main(int argc, char** argv) {
 	double c = unmetCost();
 	cout << c << '\n';
 	consolidateRoutes();
+	//constructRoute(routes[0]);
+	//constructRoute(routes[1]);
 	for (int i = 0; i <= 5; i++) {
 		cout << "\nIteration " << i << '\n';
 		vector<rebalancingRoute> stationSeqSet;
 		stationSeqSet.clear();
 		for (int i = 0; i < routes.size(); i++) {
-			vector<string> stationSeq = getStationSequence(routes[i]);
-			rebalancingRoute *RR = new rebalancingRoute(stationSeq);
+			rebalancingRoute *RR = new rebalancingRoute(routes[i]);
 			stationSeqSet.push_back(*RR);
 			delete RR;
 			/*for (auto iter = stationSeqSet.begin(); iter != stationSeqSet.end(); iter++) {
@@ -65,24 +64,39 @@ int main(int argc, char** argv) {
 				}
 			}*/
 		}
-
-
 		stationSeqSet[0].intraRI(3);
+		stationSeqSet[0].intraRI(2);
+		stationSeqSet[0].intraRI(1);
 		stationSeqSet[1].intraIC(3);
+		stationSeqSet[0].intraIC(3);
+		stationSeqSet[0].intraIC(2);
+		stationSeqSet[0].intraIC(1);
+		stationSeqSet[3].intraIC(1);
+		stationSeqSet[1].intraIC(1);
+		stationSeqSet[2].intraIC(1);
+		stationSeqSet[0].intraNS(2);
+		stationSeqSet[1].intraNS(2);
 		stationSeqSet[2].intraNS(2);
+		stationSeqSet[2].intraNS(1);
+
 		stationSeqSet[0].interCR(3, stationSeqSet[1]);
 		stationSeqSet[1].interNS(3, stationSeqSet[2]);
-		stationSeqSet[2].interSH(2, stationSeqSet[3]);
+		//stationSeqSet[2].interSH(2, stationSeqSet[3]);
 		stationSeqSet[3].interCT(stationSeqSet[4]);
 
 		routeLinkSet.clear();
 		for (int i = 0; i < routes.size(); i++) {
 			vector<string> canR = constructRoute(stationSeqSet[i].route);
+			cout << i << '\n';
 			for (auto iter = canR.begin(); iter != canR.end(); iter++) {
 				routeLinkSet.push_back((*iter));
 			}
 		}
 		
+		for (auto iter = routeLinkSet.begin(); iter != routeLinkSet.end(); iter++) {
+			cout << (*iter) << '\t';
+		}
+		cout << '\n';
 		createResNetwork();
 		optModel.updateModel();
 		optModel.setSolution();

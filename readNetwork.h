@@ -23,14 +23,13 @@
 
 using namespace std;
 
-
 map<string, node*> nodes;
 map<string, link*> links;
 map<string, map<string, int>> traveltime;
+map<string, map<string, vector<string>>> accMap;
 
 float demandCoef;
 float distanceCoef;
-
 
 void readParameters(float _distance, float _demand){
     distanceCoef = _distance;
@@ -38,7 +37,7 @@ void readParameters(float _distance, float _demand){
 }
 
 void readNetwork(const string loc){
-    string nInput, lInput, dInput;
+    string nInput, lInput, dInput, aInput;
     string line;
     node* tmpNodePntr;
     link* tmpLinkPntr;
@@ -46,6 +45,7 @@ void readNetwork(const string loc){
     nInput = loc + "NiceRideNodes_May1820.txt";
     lInput = loc + "NiceRideLinks_May1820.txt";
 	dInput = loc + "Distance.txt";
+	aInput = loc + "accMap.txt"; // accessibility map
 
     ifstream nodefile (nInput);
     if (nodefile.is_open()){
@@ -118,8 +118,36 @@ void readNetwork(const string loc){
 		}
 		traveltime[fromNode] = dis;
 	}
-
 	distancefile.close();
+
+
+	ifstream accfile(aInput);
+	if (accfile.is_open()) {
+		map <string, vector<string>> * p = new map<string, vector<string>>();
+		string lastorigin = "";
+
+		while (getline(accfile, line)) {
+			stringstream ss(line);
+			vector<string> tokens;
+			string buf;
+			while (ss >> buf) {
+				tokens.push_back(buf);
+			}
+
+			(*p)[tokens[1]].insert((*p)[tokens[1]].begin(), tokens.begin() + 2, tokens.end());
+
+
+			if (lastorigin != tokens[0] && (*p).size() != 1) {
+				accMap[lastorigin] = *p;
+				p = new map<string, vector<string>>();
+			}
+
+			lastorigin = tokens[0];
+		}
+		accMap[lastorigin] = *p;
+		delete p;
+	}
+	accfile.close();
 }
 
 

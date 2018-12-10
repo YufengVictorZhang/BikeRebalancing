@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 using namespace std;
-
+const int MAXITER = 100;
 
 //void maxOperations(path& P){
 //    
@@ -89,11 +89,13 @@ using namespace std;
 //    
 //}
 
+
 class rebalancingRoute {
 		
 	public:
 		vector<string> route;			//route is comprised of a sequence of non-time-indexed nodes
 		int length;
+
 
 		rebalancingRoute(vector<string> &);
 
@@ -109,6 +111,7 @@ class rebalancingRoute {
 		void interCT(rebalancingRoute &);  //concatenating two routes by cutting down them into two parts
 
 		int checkTimeFeasibility();
+		int checkSpaceFeasibility(vector<string>&);
 		void updateLength();
 };
 
@@ -117,79 +120,214 @@ rebalancingRoute::rebalancingRoute(vector<string>& _r) {
 	length = _r.size();
 }
 
-void rebalancingRoute::intraRI(int neighbor) {    // reinsertion a subsequence to another position of the route
-	//srand(time(NULL));
-	vector<string> subsequence;
+//void rebalancingRoute::intraRI(int neighbor) {    // reinsertion a subsequence to another position of the route
+//	
+//	vector<string> subsequence;
+//	vector<string>::iterator iter = route.begin();
+//	int begin = rand() % ( length - neighbor - 1);
+//	int end = begin + neighbor + 1;
+//	int loc = 0;
+//
+//	subsequence.insert(subsequence.begin(), iter + begin, iter + end);
+//	route.erase(iter + begin, iter + end);
+//
+//	do {
+//		loc = rand() % route.size();
+//	} while (loc == begin);
+//
+//	route.insert(iter + loc, subsequence.begin(), subsequence.end());
+//
+//}
+
+void rebalancingRoute::intraRI(int neighbor) {    // reinsert a subsequence to another position of the route
+
+	vector<string> vec;
 	vector<string>::iterator iter = route.begin();
-	int begin = rand() % ( length - neighbor - 1);
-	int end = begin + neighbor + 1;
-	int loc = 0;
-
-	subsequence.insert(subsequence.begin(), iter + begin, iter + end);
-	route.erase(iter + begin, iter + end);
-
-	for (auto iter = subsequence.begin(); iter != subsequence.end(); iter++) {
-		cout << (*iter) << '\t';
-	}
-	cout << '\n';
+	int begin, end, loc = 0;
+	int flag = 0;
+	int counter = 0;
 
 	do {
-		loc = rand() % route.size();
-	} while (loc == begin);
+		vec.clear();
+		counter++;
+		begin = rand() % (length - neighbor);
+		end = begin + neighbor + 1;
 
-	route.insert(iter + loc, subsequence.begin(), subsequence.end());
+		do {
+			loc = rand() % route.size();
+			//cout << begin << '\t' << end << '\t'<< loc << '\n';
+		} while (loc >= begin && loc<=end) ;
+		
+		if (loc < begin) {
+			vec.insert(vec.begin(), route.begin(), iter + loc);
+			vec.insert(vec.end(), iter + begin, iter + end);
+			vec.insert(vec.end(), iter + loc, iter + begin);
+			vec.insert(vec.end(), iter + end, route.end());
 
-	//for (auto iter = route.begin(); iter != route.end(); iter++) {
-	//	cout << (*iter) << '\t';
-	//}
+			/*cout << '\n';
+			for (auto iter = vec.begin(); iter != vec.end(); iter++) {
+				cout << *(iter) << '\t';
+			}
+			cout << '\n';*/
+		}
+		else {
+			vec.insert(vec.begin(), route.begin(), iter + begin);
+			vec.insert(vec.end(), iter + end, iter + loc);
+			vec.insert(vec.end(), iter + begin, iter + end);
+			vec.insert(vec.end(), iter + loc, route.end());
 
-	//constructRoute(route);
+			/*cout << '\n';
+			for (auto iter = vec.begin(); iter != vec.end(); iter++) {
+				cout << *(iter) << '\t';
+			}
+			cout << '\n';*/
+		}
+		flag = checkSpaceFeasibility(vec);
+
+		if (flag == 1) {
+			cout << "\nIntraRI succeeded!\n";
+			route.clear();
+			route.insert(route.begin(), vec.begin(), vec.end());
+			//cout << '\n';
+			//for (auto iter = route.begin(); iter != route.end(); iter++) {
+			//	cout << *(iter) << '\t';
+			//}
+			//cout << '\n';
+		}
+
+	} while (flag == 0 && counter < MAXITER);
 }
+
+//void rebalancingRoute::intraIC(int neighbor) { //interchange two subsequences
+//	vector<string>::iterator iter = route.begin();
+//	int begin1 = rand() % (length - neighbor - 1);
+//	int end1 = begin1 + neighbor + 1;
+//	int begin2, end2;
+//	
+//	//shall make sure two subsequences do not overlap
+//	do {
+//		begin2 = rand() % (length - neighbor - 1);
+//		end2 = begin2 + neighbor + 1;
+//	} while ((begin2 == begin1) ||  (begin2<end1 && end2>end1) || (begin1<end2 && end2<end1));
+//
+//	//sub1.insert(sub1.begin(), iter + begin1, iter + end1);
+//	//sub2.insert(sub2.begin(), iter + begin2, iter + end2);
+//	
+//	std::swap_ranges(iter+begin1, iter + end1, iter + begin2);
+//	
+//}
 
 void rebalancingRoute::intraIC(int neighbor) { //interchange two subsequences
-	//vector<string> sub1;
-	//vector<string> sub2;
 
+	vector<string> vec;
 	vector<string>::iterator iter = route.begin();
-	int begin1 = rand() % (length - neighbor - 1);
-	int end1 = begin1 + neighbor + 1;
-	int begin2, end2;
 	
-	//shall make sure two subsequences do not overlap
-	do {
-		begin2 = rand() % (length - neighbor - 1);
-		end2 = begin2 + neighbor + 1;
-	} while ((begin2 == begin1) ||  (begin2<end1 && end2>end1) || (begin1<end2 && end2<end1));
+	int begin1, end1, begin2, end2;
+	int flag = 0;
+	int counter = 0;
 
-	//sub1.insert(sub1.begin(), iter + begin1, iter + end1);
-	//sub2.insert(sub2.begin(), iter + begin2, iter + end2);
-	
-	std::swap_ranges(iter+begin1, iter + end1, iter + begin2);
-	
+	do{
+		counter++;
+		vec.clear();
+		//shall make sure two subsequences do not overlap
+		do {
+			begin1 = rand() % (length - neighbor);
+			end1 = begin1 + neighbor + 1;
+			begin2 = rand() % (length - neighbor);
+			end2 = begin2 + neighbor + 1;
+		} while ((begin2 == begin1) || (end1>begin2 && end1<end2) || (end2 > begin1 && end2 < end1));
+
+		vec = route;
+
+		/*cout << '\n';
+		for (auto iter = vec.begin(); iter != vec.end(); iter++) {
+			cout << *(iter) << '\t';
+		}
+		cout << '\n';
+		cout << begin1 << '\t' << end1 << '\t' << begin2 << '\t' << end2 << '\n';
+		cout << *(iter+begin1) << '\t' << *(iter + end1-1) << '\t' << *(iter + begin2) << '\t' << *(iter + end2-1) << '\n';
+		*/
+		
+		vector<string>::iterator it = vec.begin();
+		std::swap_ranges(it+begin1, it+end1, it+begin2);
+
+		flag = checkSpaceFeasibility(vec);
+		if (flag == 1) {
+			cout << "\nIntraIC succeeded!\n";
+			route.clear();
+			route.insert(route.begin(), vec.begin(), vec.end());
+		}
+		
+	} while  (flag == 0 && counter < MAXITER);
 }
 
 
+
+//void rebalancingRoute::intraNS(int neighbor) {
+//	
+//	int loc1, loc2, latest1, latest2;
+//	int counter = 0;
+//	latest1 = latest2 = 999;
+//
+//	vector<string>::iterator iter = route.begin();
+//
+//	for (int i = 0; i < neighbor; i++) {
+//		do {
+//			loc1 = rand() % (length-1);
+//			loc2 = rand() % (length-1);
+//		} while (loc2 == loc1 || (latest1==loc2 && latest2==loc1));
+//		
+//		latest1 = loc1;
+//		latest2 = loc2;
+//		std::iter_swap(iter + loc1, iter + loc2);
+//	}
+//
+//	/*cout << "after route\n";
+//	for (auto iter = route.begin(); iter != route.end(); iter++) {
+//		cout << (*iter) << '\t';
+//	}
+//	cout << "\n";*/
+//}
+
 void rebalancingRoute::intraNS(int neighbor) {
-	
+
 	int loc1, loc2, latest1, latest2;
 	int counter = 0;
-	latest1 = latest2 = 999;
+	int flagsum = 0;
+	vector<string> vec;
 
-	vector<string>::iterator iter = route.begin();
+	do {
+		counter++;
+		vec.clear();
+		latest1 = latest2 = 999;
+		for (int i = 0; i < neighbor; i++) {
+			int flag, c;
+			flag = 0;
+			c = 0;
+			do {
+				c++;
+				do {
+					loc1 = rand() % length;
+					loc2 = rand() % length;
+				} while (loc2 == loc1 || (latest1 == loc2 && latest2 == loc1));
+				vec = route;
+				vector<string>::iterator it = vec.begin();
+				std::iter_swap(it + loc1, it + loc2);
+				flag = checkSpaceFeasibility(vec);
+				if (flag == 1) {
+					route = vec;
+					flagsum += 1;
+				}
+			} while (flag == 0 && c<MAXITER/4);
+			latest1 = loc1;
+			latest2 = loc2;
+		}
+		if (flagsum == neighbor) {
+			cout << "\nInterNS succeeded!\n";
+		}
+	} while (flagsum != neighbor && counter < MAXITER);
+	
 
-	for (int i = 0; i < neighbor; i++) {
-		do {
-			loc1 = rand() % (length-1);
-			loc2 = rand() % (length-1);
-		} while (loc2 == loc1 || (latest1==loc2 && latest2==loc1));
-		std::iter_swap(iter + loc1, iter + loc2);
-	}
-
-	/*cout << "after route\n";
-	for (auto iter = route.begin(); iter != route.end(); iter++) {
-		cout << (*iter) << '\t';
-	}
-	cout << "\n";*/
 }
 
 //void rebalancingRoute::intraAD (int neighbor, rebalancingRoute& route2) {
@@ -221,6 +359,49 @@ void rebalancingRoute::interCR(int neighbor, rebalancingRoute& route2) { //inter
 	}
 	cout << "\n";*/
 }
+
+//void rebalancingRoute::interCR(int neighbor, rebalancingRoute& route2) { //inter crossover
+//
+//	int begin1, begin2, end1;
+//	int flag = 0;
+//	vector<string>::iterator iter1;
+//	vector<string>::iterator iter2;
+//	vector<string> vec;
+//
+//	iter1 = route.begin();
+//	iter2 = route2.route.begin();
+//
+//	do {
+//		begin1 = rand() % (length - neighbor - 1);
+//		begin2 = rand() % (route2.length - neighbor - 1);
+//		end1 = begin1 + neighbor + 1;
+//
+//		vec.push_back(*(iter2+begin2-1));
+//		vec.push_back(*(iter1+begin1));
+//		vec.push_back(*(iter1+end1-1));
+//		vec.push_back(*(iter2+end1));
+//		vec.push_back(*(iter1+begin1-1 ));
+//		vec.push_back(*(iter2+begin2));
+//		vec.push_back(*(iter2+end1-1));
+//		vec.push_back(*(iter1+end1));
+//
+//		flag = checkSpaceFeasibility(vec);
+//		vec.clear();
+//	} while (flag == 0);
+//	
+//	
+//	swap_ranges(iter1 + begin1, iter1 + end1, iter2 + begin2);
+//
+//	/*cout << "after route\n";
+//	for (auto iter = route.begin(); iter != route.end(); iter++) {
+//		cout << (*iter) << '\t';
+//	}
+//	cout << "\n";
+//	for (auto iter = route2.route.begin(); iter != route2.route.end(); iter++) {
+//		cout << (*iter) << '\t';
+//	}
+//	cout << "\n";*/
+//}
 
 void rebalancingRoute::interNS(int neighbor, rebalancingRoute& route2) {  //node swapping
 	int begin1, begin2;
@@ -324,6 +505,19 @@ void rebalancingRoute::interCT(rebalancingRoute& route2) { // break routes and c
 	cout << "\n";*/
 }
 
+
+int rebalancingRoute::checkSpaceFeasibility(vector<string>& vec) { // vec used to store nodes that should be connected
+	vector<string>::iterator iter = vec.begin();
+	while (iter != vec.end()-1) {
+		if (traveltime.find(*iter)->second.find(*(iter + 1))== traveltime.find(*iter)->second.end()) {
+			//cout <<'\n'<< (*iter)<<'\t'<<*(iter + 1) <<"\n Not in map\n";
+			return 0;
+		}
+		iter += 1;
+	}
+	return 1;
+}
+
 int rebalancingRoute::checkTimeFeasibility() {
 	int time = 0;
 	for (auto iter = route.begin(); iter != route.end()-1; iter++) {
@@ -331,7 +525,7 @@ int rebalancingRoute::checkTimeFeasibility() {
 			time += 1;
 		}
 		else {
-			time += traveltime[(*iter)][(*(iter + 1))];
+			time += traveltime.find(*iter)->second.find(*(iter + 1))->second;
 		}		
 	}
 
@@ -340,6 +534,8 @@ int rebalancingRoute::checkTimeFeasibility() {
 	}
 	return 0;
 }
+
+
 
 
 void rebalancingRoute::updateLength() {

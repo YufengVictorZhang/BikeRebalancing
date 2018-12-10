@@ -63,7 +63,7 @@ void GUROBIinstance::createModel() {
 		if (vname != "D2" && vname != "D1") {
 			int time = stoi(vname.substr(vname.find("_") + 1, vname.length()));
 			if (time == 29 || time == 59) {
-				splus[index].set(GRB_DoubleAttr_Obj, 0.0);
+				splus[index].set(GRB_DoubleAttr_Obj, alpha);
 				splus[index].set(GRB_DoubleAttr_LB, 0.0);
 				sminus[index].set(GRB_DoubleAttr_Obj, alpha);
 				sminus[index].set(GRB_DoubleAttr_LB, 0.0);
@@ -121,7 +121,7 @@ void GUROBIinstance::createModel() {
 		if (node != "D1" && node != "D2") {
 			int time = stoi(node.substr(node.find("_") + 1, node.length()));
 			if (time == 29 || time == 59) {
-				if (nodes[node]->getDemand() <= 0) {
+				if (nodes[node]->getDemand() <= 0) { // <
 					nodeBalance += splus[splusIndexName[node]];
 				}
 				else {
