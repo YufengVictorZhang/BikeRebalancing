@@ -13,7 +13,7 @@
 using namespace std;
 
 vector<string> routeLinkSet;   //used to restore generated vehicle routes, including the initially randomaly generated ones
-
+vector< vector<string> > routes;
 
 vector<string> getStationSequence(vector<string> &route) {
 	vector<string> station;

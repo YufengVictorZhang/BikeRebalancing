@@ -11,7 +11,7 @@ using namespace std;
 struct MyStruct;
 struct less_than_key;
 
-vector< vector<string> > routes;
+
 
 struct MyStruct
 {
