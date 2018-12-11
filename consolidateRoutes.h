@@ -11,8 +11,6 @@ using namespace std;
 struct MyStruct;
 struct less_than_key;
 
-vector< vector<string> > routes;
-
 struct MyStruct
 {
 	int key;
@@ -157,15 +155,15 @@ void consolidateRoutes() {
 		routes.push_back(candidateRoute);
 	}
 
-	cout << "consolidated routes\n";
+	/*cout << "consolidated routes\n";
 	for (auto iter = routes.begin(); iter != routes.end(); iter++) {
 		
 		vector<string> R;
 		R = *iter;
-		/*	cout << "route\t";
+		cout << "route\t";
 		for (auto IT = R.begin(); IT != R.end(); IT++) {
 			cout << (*IT) << '\t';
 		}
-		cout << '\n';*/
-	}
+		cout << '\n';
+	}*/
 }

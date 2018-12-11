@@ -14,6 +14,8 @@ using namespace std;
 
 vector<string> routeLinkSet;   //used to restore generated vehicle routes, including the initially randomaly generated ones
 
+vector< vector<string> > routes;
+
 
 vector<string> getStationSequence(vector<string> &route) {
 	vector<string> station;
@@ -54,6 +56,7 @@ const vector<string> randomRoute() {
 		cout << *(iter) << '\t';
 	}
 	cout << '\n';*/
+	
 	return route;
 }
 
@@ -62,7 +65,10 @@ void genInitialRouteLinkSet() {
 	srand(time(NULL));
 	for (int i = 0; i<10; i++) {
 		vector<string> singleroute;
+		vector <string> routewodepot;
 		singleroute = randomRoute();
+		routewodepot.insert(routewodepot.begin(),singleroute.begin()+1,singleroute.end()-1);
+		routes.push_back(getStationSequence(routewodepot));
 		for (auto iter = singleroute.begin(); iter!= singleroute.end(); iter++) {
 			routeLinkSet.push_back(*iter);
 			//cout << *iter << '\n';

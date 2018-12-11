@@ -250,6 +250,7 @@ void GUROBIinstance::solveModel() {
 	model.set(GRB_StringAttr_ModelName, "RPMCFP");
 	model.set(GRB_IntAttr_ModelSense, GRB_MINIMIZE);
 	model.set(GRB_DoubleParam_MIPGap, 0.03);
+	model.set(GRB_IntParam_OutputFlag, 0);
 	model.update();
 	model.optimize();
 
@@ -258,7 +259,7 @@ void GUROBIinstance::solveModel() {
 void GUROBIinstance::setPostiveLinkResults(){
 	
 	positiveLinkSet.clear();
-	cout << "\nTOTAL COSTS: " << model.get(GRB_DoubleAttr_ObjVal) << endl;
+	//cout << "\nTOTAL COSTS: " << model.get(GRB_DoubleAttr_ObjVal) << endl;
 	
 	for (auto iter = links.begin(); iter != links.end(); iter++) {
 		if ((*iter).second->getResStatus() == 1 && (*iter).second->getType() == "transship") {
