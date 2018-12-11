@@ -75,6 +75,8 @@ int main(int argc, char** argv) {
 		stationSeqSet[1].intraNS(2);
 		stationSeqSet[2].intraNS(2);
 		stationSeqSet[2].intraNS(1);
+		
+		cout<<"this is a new branch\n"
 
 
 		stationSeqSet[0].interCR(1, stationSeqSet[1]);
