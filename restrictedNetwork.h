@@ -20,7 +20,7 @@ void createResNetwork() {
 
 	for (auto iter = routeLinkSet.begin(); iter != routeLinkSet.end(); iter++) {
 		//cout << (*iter) << '\t';
-		if (links[(*iter)]->getType() == "transship") {    
+		if(links.find((*iter))!=links.end() && links[(*iter)]->getType() == "transship"){
 			links[(*iter)]->setResNetwork();
 		}
 	}

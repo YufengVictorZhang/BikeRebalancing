@@ -37,19 +37,21 @@ int main(int argc, char** argv) {
 	cout << "Start!" << endl;
 	readNetwork("C:/Users/victo/Downloads/");
 	cout << "Finish reading the network!" << endl;
+	clock_t start = clock();
 	genInitialRouteLinkSet();
 	createResNetwork();
 	GUROBIinstance optModel;
 	optModel.createModel();
 	optModel.solveModel();
-	optModel.printResults();
+	optModel.setPostiveLinkResults();
 	optModel.setSolution();
 	double c = unmetCost();
 	cout << c << '\n';
 	consolidateRoutes();
 	//constructRoute(routes[0]);
 	//constructRoute(routes[1]);
-	for (int i = 0; i <= 5; i++) {
+
+	for (int i = 0; i <= 10; i++) {
 		cout << "\nIteration " << i << '\n';
 		vector<rebalancingRoute> stationSeqSet;
 		stationSeqSet.clear();
@@ -57,13 +59,8 @@ int main(int argc, char** argv) {
 			rebalancingRoute *RR = new rebalancingRoute(routes[i]);
 			stationSeqSet.push_back(*RR);
 			delete RR;
-			/*for (auto iter = stationSeqSet.begin(); iter != stationSeqSet.end(); iter++) {
-				cout << "\n Route"<< distance(stationSeqSet.begin(), iter) <<":\n";
-				for (auto it = iter->route.begin(); it != iter->route.end(); it++) {
-					cout << (*it) << '\t';
-				}
-			}*/
-		}
+		}		
+		
 		stationSeqSet[0].intraRI(3);
 		stationSeqSet[0].intraRI(2);
 		stationSeqSet[0].intraRI(1);
@@ -79,27 +76,56 @@ int main(int argc, char** argv) {
 		stationSeqSet[2].intraNS(2);
 		stationSeqSet[2].intraNS(1);
 
+
+		stationSeqSet[0].interCR(1, stationSeqSet[1]);
+		stationSeqSet[1].interCR(1, stationSeqSet[2]);
+		stationSeqSet[0].interCR(2, stationSeqSet[1]);
+		stationSeqSet[1].interCR(2, stationSeqSet[2]);
 		stationSeqSet[0].interCR(3, stationSeqSet[1]);
+		stationSeqSet[1].interCR(3, stationSeqSet[2]);
+		
+		
+		stationSeqSet[0].interNS(1, stationSeqSet[1]);
+		stationSeqSet[1].interNS(1, stationSeqSet[2]);
+		stationSeqSet[2].interNS(1, stationSeqSet[3]);
+		stationSeqSet[0].interNS(2, stationSeqSet[1]);
+		stationSeqSet[1].interNS(2, stationSeqSet[2]);
+		stationSeqSet[2].interNS(2, stationSeqSet[3]);
+		stationSeqSet[0].interNS(3, stationSeqSet[1]);
 		stationSeqSet[1].interNS(3, stationSeqSet[2]);
-		//stationSeqSet[2].interSH(2, stationSeqSet[3]);
-		stationSeqSet[3].interCT(stationSeqSet[4]);
+		stationSeqSet[2].interNS(3, stationSeqSet[3]);
+
+		stationSeqSet[0].interCT(stationSeqSet[1]);
+		stationSeqSet[1].interCT(stationSeqSet[2]);
+		stationSeqSet[2].interCT(stationSeqSet[3]);
+		stationSeqSet[5].interCT(stationSeqSet[1]);
+
+		stationSeqSet[0].interSH(1, stationSeqSet[1]);
+		stationSeqSet[0].interSH(2, stationSeqSet[1]);
+		stationSeqSet[0].interSH(3, stationSeqSet[1]);
+		stationSeqSet[4].interSH(3, stationSeqSet[1]);
+		stationSeqSet[5].interSH(3, stationSeqSet[2]);
+		stationSeqSet[6].interSH(3, stationSeqSet[3]);
 
 		routeLinkSet.clear();
 		for (int i = 0; i < routes.size(); i++) {
 			vector<string> canR = constructRoute(stationSeqSet[i].route);
-			cout << i << '\n';
+			//cout << i << '\n';
 			for (auto iter = canR.begin(); iter != canR.end(); iter++) {
 				routeLinkSet.push_back((*iter));
 			}
 		}
-		
-		for (auto iter = routeLinkSet.begin(); iter != routeLinkSet.end(); iter++) {
+
+		/*for (auto iter = routeLinkSet.begin(); iter != routeLinkSet.end(); iter++) {
 			cout << (*iter) << '\t';
 		}
-		cout << '\n';
+		cout << '\n';*/
+
 		createResNetwork();
 		optModel.updateModel();
+		optModel.solveModel();
 		optModel.setSolution();
+		optModel.setPostiveLinkResults();
 		c = unmetCost();
 		cout << c << '\n';
 	}
@@ -137,6 +163,9 @@ int main(int argc, char** argv) {
 	//c = totalCost();
 	//cout << c << '\n';
 	optModel.deleteModel();
+	clock_t end = clock();
+	double time = (double)(end - start) / CLOCKS_PER_SEC;
+	cout << "\nTotal time" << time;
 	return 0;
 	
 }

@@ -18,11 +18,8 @@ vector<string> constructRoute(vector<string> &station) {
 		}
 		else {
 			//time += traveltime[(*iter)][*(iter + 1)];
-			try {
-				time += (traveltime.find(*iter)->second).find(*(iter + 1))->second;
-			}
-			catch(...){
-				cout << "Link not feasible!";
+			if((traveltime.find(*iter)->second).find(*(iter + 1))!= (traveltime.find(*iter)->second).end()){
+				 time += traveltime[(*iter)][*(iter + 1)];
 			}
 		}
 		
@@ -31,11 +28,13 @@ vector<string> constructRoute(vector<string> &station) {
 		route.push_back(link);
 		iter = iter + 1;
 	}
-	cout << '\n';
+
+	/*cout << '\n';
 	for (auto iter = route.begin(); iter != route.end(); iter++) {
 		cout << *(iter) << '\t';
 	}
-	cout << '\n';
+	cout << '\n';*/
+
 	return route;
 
 }

@@ -49,11 +49,11 @@ const vector<string> randomRoute() {
 		route.push_back(currentLink);
 		currentNode = currentLink.substr(currentLink.find(",")+1, currentLink.length());
 	}
-	cout << "RandomRoute\n";
+	/*cout << "RandomRoute\n";
 	for (auto iter = route.begin(); iter != route.end(); iter++) {
 		cout << *(iter) << '\t';
 	}
-	cout << '\n';
+	cout << '\n';*/
 	return route;
 }
 

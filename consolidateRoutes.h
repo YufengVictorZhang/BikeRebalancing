@@ -113,7 +113,7 @@ void consolidateRoutes() {
 		iter = positiveLinkSetcopy.erase(iter);
 		iter = positiveLinkSetcopy.erase(iter);
 
-		while (time< 60-4 && iter!=positiveLinkSetcopy.end()) {  //2*2 = 4
+		while (time< 60-6 && iter!=positiveLinkSetcopy.end()) {  //2*2 = 4
 			string curStation = candidateRoute.back();
 			string nextStation = *(iter);
 			if (curStation == nextStation) {
@@ -152,19 +152,20 @@ void consolidateRoutes() {
 				}
 			}
 		}
-		cout << time << '\n';
-		cout << positiveLinkSetcopy.size()<<'\n';
+		/*cout << time << '\n';
+		cout << positiveLinkSetcopy.size()<<'\n';*/
 		routes.push_back(candidateRoute);
 	}
 
 	cout << "consolidated routes\n";
 	for (auto iter = routes.begin(); iter != routes.end(); iter++) {
-		cout << "route\t";
+		
 		vector<string> R;
 		R = *iter;
+		/*	cout << "route\t";
 		for (auto IT = R.begin(); IT != R.end(); IT++) {
 			cout << (*IT) << '\t';
 		}
-		cout << '\n';
+		cout << '\n';*/
 	}
 }
