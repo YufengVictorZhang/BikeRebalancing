@@ -7,11 +7,11 @@
 #include <map>
 #include <string>
 
-
 using namespace std;
 
 vector<string> positiveLinkSet;
-const int alpha = 10;
+const int alpha = 20;
+const int CV = 10;
 
 class GUROBIinstance{
 
@@ -22,7 +22,6 @@ public:
 	GRBVar *x = 0;
 	GRBVar *splus = 0;
 	GRBVar *sminus = 0;
-	//GRBConstr *LinkConstr = 0;
 
 	int activeLink = 0;
 	int nodesize = 0;
@@ -36,7 +35,7 @@ public:
 	void createModel();
 	void updateModel();
 	void solveModel();
-	void setPostiveLinkResults();
+	double setPostiveLinkResults();
 	void setSolution();
 	int deleteModel();
 
@@ -44,6 +43,12 @@ public:
 
 
 void GUROBIinstance::createModel() {
+
+	model.set(GRB_StringAttr_ModelName, "RPMCFP");
+	model.set(GRB_IntAttr_ModelSense, GRB_MINIMIZE);
+	model.set(GRB_DoubleParam_MIPGap, 0.03);
+	model.set(GRB_IntParam_OutputFlag, 0);
+	model.set(GRB_IntParam_Presolve, 2); // aggressive presolve
 
 	nodesize = 0;
 	for (auto iter = nodes.begin(); iter != nodes.end(); iter++) {
@@ -141,7 +146,7 @@ void GUROBIinstance::createModel() {
 			string toNode;
 			toNode = (*iter).first.substr((*iter).first.find(",") + 1, (*iter).first.length());
 			LinkConstr.push_back(model.addConstr(y[yIndexName[(*iter).first]], GRB_LESS_EQUAL, nodes[toNode]->getCapacity()));
-			LinkConstr.push_back(model.addConstr(y[yIndexName[(*iter).first]], GRB_LESS_EQUAL, 20 * x[xIndexName[(*iter).first]]));
+			LinkConstr.push_back(model.addConstr(y[yIndexName[(*iter).first]], GRB_LESS_EQUAL, CV * x[xIndexName[(*iter).first]]));
 			//model.addConstr(y[yIndexName[(*iter).first]], GRB_LESS_EQUAL, nodes[tokens[1]]->getCapacity());
 		}
 	}
@@ -157,11 +162,11 @@ void GUROBIinstance::updateModel() {
 
 	xIndexName.clear();
 	yIndexName.clear();
-	model.remove(*x);
-	model.remove(*y);
-	delete[] x;
-	delete[] y;
-
+	int numBiVars = model.get(GRB_IntAttr_NumBinVars);
+	for (int i = 0; i < numBiVars; i++) {
+		model.remove(x[i]);
+		model.remove(y[i]);
+	}
 	
 	for (auto iter = LinkConstr.begin(); iter != LinkConstr.end(); iter++) {
 		model.remove((*iter));
@@ -203,7 +208,7 @@ void GUROBIinstance::updateModel() {
 			string toNode;
 			toNode = (*iter).first.substr((*iter).first.find(",") + 1, (*iter).first.length());
 			LinkConstr.push_back(model.addConstr(y[yIndexName[(*iter).first]], GRB_LESS_EQUAL, nodes[toNode]->getCapacity()));
-			LinkConstr.push_back(model.addConstr(y[yIndexName[(*iter).first]], GRB_LESS_EQUAL, 20 * x[xIndexName[(*iter).first]]));
+			LinkConstr.push_back(model.addConstr(y[yIndexName[(*iter).first]], GRB_LESS_EQUAL, CV * x[xIndexName[(*iter).first]]));
 		}
 	}
 
@@ -242,21 +247,17 @@ void GUROBIinstance::updateModel() {
 		}
 		NodeConstr.push_back(model.addConstr(nodeBalance, GRB_EQUAL, -nodes[node]->getDemand()));
 	}
+	model.update();
 }
 
 
 void GUROBIinstance::solveModel() {
 
-	model.set(GRB_StringAttr_ModelName, "RPMCFP");
-	model.set(GRB_IntAttr_ModelSense, GRB_MINIMIZE);
-	model.set(GRB_DoubleParam_MIPGap, 0.03);
-	model.set(GRB_IntParam_OutputFlag, 0);
-	model.update();
 	model.optimize();
 
 }
 
-void GUROBIinstance::setPostiveLinkResults(){
+double GUROBIinstance::setPostiveLinkResults(){
 	
 	positiveLinkSet.clear();
 	//cout << "\nTOTAL COSTS: " << model.get(GRB_DoubleAttr_ObjVal) << endl;
@@ -265,18 +266,20 @@ void GUROBIinstance::setPostiveLinkResults(){
 		if ((*iter).second->getResStatus() == 1 && (*iter).second->getType() == "transship") {
 			if (y[xIndexName[(*iter).first]].get(GRB_DoubleAttr_X) != 0) {
 				positiveLinkSet.push_back((*iter).first);
+				//cout << (*iter).first << '\t' << y[xIndexName[(*iter).first]].get(GRB_DoubleAttr_X) << '\n';
 			}
 		}
 	}
 
-	/*for (auto iter = nodes.begin(); iter != nodes.end(); iter++) {
-		if (sminus[sminusIndexName[(*iter).first]].get(GRB_DoubleAttr_X) != 0 ||
-			splus[splusIndexName[(*iter).first]].get(GRB_DoubleAttr_X) != 0) {
-			cout << (*iter).first << '\t' << nodes[(*iter).first]->getDemand() << '\t' <<
-				splus[splusIndexName[(*iter).first]].get(GRB_DoubleAttr_X) << '\t' <<
-				sminus[sminusIndexName[(*iter).first]].get(GRB_DoubleAttr_X) << '\n';
+	int c = 0;
+	for (auto iter = nodes.begin(); iter != nodes.end(); iter++) {
+		if (splus[splusIndexName[(*iter).first]].get(GRB_DoubleAttr_X) != 0) {
+			//cout << (*iter).first << '\t' << nodes[(*iter).first]->getDemand() << '\t' <<
+			c += splus[splusIndexName[(*iter).first]].get(GRB_DoubleAttr_X);
 		}
-	}*/
+	}
+
+	return c * alpha;
 
 }
 

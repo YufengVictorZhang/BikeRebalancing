@@ -15,6 +15,7 @@ double travelCost() {
 }
 
 double unmetCost() {
+
 	double c = 0;
 	for (auto iter = nodes.begin(); iter != nodes.end(); iter++) {
 		string node = (*iter).first;

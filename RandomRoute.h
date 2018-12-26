@@ -37,7 +37,8 @@ vector<string> getStationSequence(vector<string> &route) {
 	return station;
 }
 
-const vector<string> randomRoute() {	
+const vector<string> 
+randomRoute() {	
 	vector<string> route;
 	//route.clear();
 	string currentNode, currentLink;
@@ -62,7 +63,7 @@ const vector<string> randomRoute() {
 
 void genInitialRouteLinkSet() {
 	routeLinkSet.clear();
-	srand(time(NULL));
+	//srand(time(NULL));
 	for (int i = 0; i<10; i++) {
 		vector<string> singleroute;
 		vector <string> routewodepot;

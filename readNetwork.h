@@ -42,9 +42,12 @@ void readNetwork(const string loc){
     node* tmpNodePntr;
     link* tmpLinkPntr;
     
-    nInput = loc + "NiceRideNodes_May1820.txt";
+	nInput = loc + "NiceRideNodes_May1820.txt";
+	//nInput = loc + "SaintPaulNodes_May2918_small_5.txt";
     lInput = loc + "NiceRideLinks_May1820.txt";
+	//lInput = loc + "SaintPaulLinks_May2918_small.txt";
 	dInput = loc + "Distance.txt";
+	//dInput = loc + "SaintPaul_Distance.txt";
 	aInput = loc + "accMap.txt"; // accessibility map
 
     ifstream nodefile (nInput);
@@ -60,6 +63,7 @@ void readNetwork(const string loc){
             
             tmpNodePntr = NULL;
             tmpNodePntr = new node;
+			
             nodes[tokens[0]]= tmpNodePntr;
             nodes[tokens[0]]->initializeNode(tokens[0], tokens[1]);
         }
@@ -82,6 +86,7 @@ void readNetwork(const string loc){
             links[tokens[0]+","+tokens[1]]= tmpLinkPntr;
             links[tokens[0]+","+tokens[1]]->initializeLink(tokens[0], tokens[1], tokens[2]);
             
+			//cout << tokens[0] << '\t' << tokens[1]<<'\n';
             nodes[tokens[0]]->setOutLinks(tokens[0]+","+tokens[1]);
             nodes[tokens[1]]->setInLinks(tokens[0]+","+tokens[1]);
         }
